@@ -1,0 +1,71 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&display=swap');
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --verde: #009933;
+    --verde-oscuro: #006622;
+    --verde-claro: #e8f7ee;
+    --azul: #1C3661;
+    --naranja: #EC671B;
+    --amarillo: #F4981C;
+    --blanco: #ffffff;
+    --gris-claro: #f5f5f5;
+    --gris-texto: #444;
+    --font: 'Montserrat', sans-serif;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font);
+    background-color: var(--gris-claro);
+    color: var(--gris-texto);
+    line-height: 1.6;
+}
+
+/* Bootstrap brand overrides */
+.btn-primary {
+    background-color: var(--verde);
+    border-color: var(--verde);
+    font-family: var(--font);
+}
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+    background-color: var(--verde-oscuro) !important;
+    border-color: var(--verde-oscuro) !important;
+}
+.btn-outline-primary {
+    color: var(--verde);
+    border-color: var(--verde);
+    font-family: var(--font);
+}
+.btn-outline-primary:hover {
+    background-color: var(--verde);
+    border-color: var(--verde);
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--verde);
+    box-shadow: 0 0 0 0.2rem rgba(0, 153, 51, 0.25);
+}
+
+/* Verification badge */
+.verification-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--verde-claro);
+    color: var(--verde-oscuro);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    border: 1px solid rgba(0, 102, 34, 0.2);
+}
