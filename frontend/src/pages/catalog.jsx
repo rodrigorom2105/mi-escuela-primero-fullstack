@@ -216,7 +216,7 @@ function Catalog() {
                           {item.municipio}, Jalisco
                         </p>
 
-                        <p className="card-descripcion">{item.descripcion}</p>
+                        <p className="card-descripcion">{item.descripcion || item.propuesta}</p>
 
                         {/* Progress */}
                         <div className="card-progress-wrap">

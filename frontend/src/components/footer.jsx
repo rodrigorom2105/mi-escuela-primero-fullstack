@@ -32,9 +32,8 @@ function Footer() {
             <h4>PLATAFORMA</h4>
             <ul>
               <li><Link to="/catalogo">Explorar proyectos</Link></li>
-              <li><a href="#sobre">Cómo funciona</a></li>
+              <li><a href="/#como-funciona">Cómo funciona</a></li>
               <li><Link to="/faq">Preguntas frecuentes</Link></li>
-              <li><a href="#">Transparencia</a></li>
               <li><Link to="/admin" className="footer-admin-link">Administración</Link></li>
             </ul>
           </div>

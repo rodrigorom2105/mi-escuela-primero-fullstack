@@ -171,7 +171,7 @@ function Home() {
       </div>{/* end .hero-viewport */}
 
       {/* ── Cómo funciona ── */}
-      <section className="como-funciona">
+      <section className="como-funciona" id="como-funciona">
         <p className="section-label">El proceso</p>
         <h2 className="section-title">¿Cómo funciona?</h2>
         <p className="section-subtitle">

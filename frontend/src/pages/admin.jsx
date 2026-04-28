@@ -177,8 +177,6 @@ function AdminContent({ token, onLogout }) {
   const [appsError,          setAppsError]          = useState(null)
   const [proyectos,          setProyectos]          = useState([])
   const [proyectoEditar,     setProyectoEditar]     = useState(null)
-  const [proyectoProgreso,   setProyectoProgreso]   = useState(null)
-  const [progresoVal,        setProgresoVal]        = useState(0)
   const [editForm,           setEditForm]           = useState({})
   const [saveToast,          setSaveToast]          = useState(false)
   const notifRef = useRef(null)
@@ -283,7 +281,6 @@ function AdminContent({ token, onLogout }) {
   const openEditar = (item) => {
     setEditForm({ ...item })
     setProyectoEditar(item)
-    setProyectoProgreso(null)
   }
 
   const handleEditChange = (field, value) => {
@@ -293,19 +290,6 @@ function AdminContent({ token, onLogout }) {
   const handleSaveEdit = () => {
     setProyectos(prev => prev.map(p => p.id === editForm.id ? { ...editForm } : p))
     setProyectoEditar(null)
-    showToast()
-  }
-
-  // ── Progress handlers ────────────────────────────────────────────────────
-  const openProgreso = (item) => {
-    setProgresoVal(item.progreso ?? 0)
-    setProyectoProgreso(item)
-    setProyectoEditar(null)
-  }
-
-  const handleSaveProgreso = () => {
-    setProyectos(prev => prev.map(p => p.id === proyectoProgreso.id ? { ...p, progreso: progresoVal } : p))
-    setProyectoProgreso(null)
     showToast()
   }
 
@@ -574,62 +558,6 @@ function AdminContent({ token, onLogout }) {
                   )}
                 </div>
 
-              ) : proyectoProgreso ? (
-
-                /* ── Progress panel (full-tab view) ── */
-                <div className="panel-progreso">
-                  <button className="btn-volver" onClick={() => setProyectoProgreso(null)}>
-                    <i className="bi bi-arrow-left me-1" aria-hidden="true" />
-                    Volver a proyectos
-                  </button>
-                  <h2 className="panel-title">
-                    <i className="bi bi-bar-chart-line" aria-hidden="true" />
-                    Actualizar progreso
-                  </h2>
-                  <p className="progreso-proyecto-name">{proyectoProgreso.propuesta}</p>
-                  <p className="progreso-escuela">
-                    <i className="bi bi-building me-1" aria-hidden="true" />
-                    {proyectoProgreso.escuela} · {proyectoProgreso.municipio}
-                  </p>
-                  <div className="progreso-bar-preview">
-                    <div className="progreso-bar-fill" style={{ width: `${progresoVal}%` }} />
-                  </div>
-                  <p className="progreso-label">{progresoVal}% completado</p>
-                  <div className="progreso-slider-row">
-                    <input
-                      type="range"
-                      min={0}
-                      max={100}
-                      value={progresoVal}
-                      onChange={e => setProgresoVal(Number(e.target.value))}
-                      className="progreso-slider"
-                      aria-label="Porcentaje de progreso"
-                    />
-                    <input
-                      type="number"
-                      min={0}
-                      max={100}
-                      value={progresoVal}
-                      onChange={e => setProgresoVal(Math.min(100, Math.max(0, Number(e.target.value))))}
-                      className="progreso-number"
-                      aria-label="Valor de progreso"
-                    />
-                  </div>
-                  <div className="panel-actions">
-                    <button className="btn-cancelar" onClick={() => setProyectoProgreso(null)}>Cancelar</button>
-                    <button className="btn-guardar" onClick={handleSaveProgreso}>
-                      <i className="bi bi-check-lg me-1" aria-hidden="true" />
-                      Guardar progreso
-                    </button>
-                  </div>
-                  {saveToast && (
-                    <div className="panel-save-toast">
-                      <i className="bi bi-check-circle-fill" aria-hidden="true" />
-                      Progreso guardado correctamente.
-                    </div>
-                  )}
-                </div>
-
               ) : (
                 <>
                   <div className="admin-filtros">
@@ -685,10 +613,6 @@ function AdminContent({ token, onLogout }) {
                     <p className="tabla-count">
                       {loadingProyectos ? 'Cargando…' : `${proyectosFiltrados.length} de ${proyectos.length} proyectos`}
                     </p>
-                    <button className="btn-agregar">
-                      <i className="bi bi-plus-lg me-1" aria-hidden="true" />
-                      Agregar proyecto
-                    </button>
                   </div>
 
                   <div className="tabla-wrapper">
@@ -727,10 +651,6 @@ function AdminContent({ token, onLogout }) {
                                 <button className="btn-editar" onClick={() => openEditar(item)}>
                                   <i className="bi bi-pencil me-1" aria-hidden="true" />
                                   Editar
-                                </button>
-                                <button className="btn-progreso" onClick={() => openProgreso(item)}>
-                                  <i className="bi bi-bar-chart-line me-1" aria-hidden="true" />
-                                  Progreso
                                 </button>
                               </div>
                             </td>

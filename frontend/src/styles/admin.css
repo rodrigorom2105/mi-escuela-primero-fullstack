@@ -68,7 +68,7 @@
     background: white;
     border-radius: 12px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-    z-index: 100;
+    z-index: 200;
     overflow: hidden;
 }
 
@@ -635,44 +635,44 @@
 /* ── Status badges ── */
 .badge-pendiente {
     background: #fef3e8;
-    color: var(--naranja);
+    color: #b84d00 !important;
     border: 1px solid rgba(236, 103, 27, 0.25);
 }
 
 .badge-revision {
     background: #eaeff7;
-    color: var(--azul);
+    color: #1C3661 !important;
     border: 1px solid rgba(28, 54, 97, 0.2);
 }
 
 .badge-completado {
     background: var(--verde-claro);
-    color: var(--verde-oscuro);
+    color: #005c1e !important;
     border: 1px solid rgba(0, 153, 51, 0.2);
 }
 
 /* ── Category badges (brand palette) ── */
 .badge-material {
     background: var(--verde-claro);
-    color: var(--verde-oscuro);
+    color: #005c1e !important;
     border: 1px solid rgba(0, 153, 51, 0.2);
 }
 
 .badge-formacion {
     background: #eaeff7;
-    color: var(--azul);
+    color: #1C3661 !important;
     border: 1px solid rgba(28, 54, 97, 0.2);
 }
 
 .badge-infraestructura {
     background: #fef3e8;
-    color: var(--naranja);
+    color: #b84d00 !important;
     border: 1px solid rgba(236, 103, 27, 0.25);
 }
 
 .badge-salud {
     background: #fdf4e7;
-    color: #9a5a00;
+    color: #7a4000 !important;
     border: 1px solid rgba(244, 152, 28, 0.3);
 }
 
@@ -702,24 +702,6 @@
     color: var(--blanco);
 }
 
-.btn-progreso {
-    background: transparent;
-    border: 1.5px solid var(--naranja);
-    color: var(--naranja);
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-family: var(--font);
-    font-size: 0.75rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s, color 0.2s;
-    white-space: nowrap;
-}
-
-.btn-progreso:hover {
-    background: var(--naranja);
-    color: var(--blanco);
-}
 
 .detalle-aplicacion {
     background: var(--blanco);
@@ -780,9 +762,8 @@
     font-weight: 500;
 }
 
-/* ── Edit / Progress inline panels ── */
-.panel-editar,
-.panel-progreso {
+/* ── Edit inline panel ── */
+.panel-editar {
     background: var(--blanco);
     border-radius: 16px;
     padding: 32px;
@@ -895,71 +876,6 @@
     color: var(--gris-texto);
 }
 
-/* ── Progress panel specific ── */
-.progreso-proyecto-name {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: var(--gris-texto);
-    margin-bottom: 6px;
-}
-
-.progreso-escuela {
-    font-size: 0.82rem;
-    color: #888;
-    margin-bottom: 28px;
-}
-
-.progreso-slider-row {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 16px;
-}
-
-.progreso-slider {
-    flex: 1;
-    accent-color: var(--verde);
-    cursor: pointer;
-    height: 6px;
-}
-
-.progreso-number {
-    width: 70px;
-    padding: 8px 10px;
-    border: 1.5px solid #d8d8d8;
-    border-radius: 8px;
-    font-family: var(--font);
-    font-size: 0.88rem;
-    font-weight: 700;
-    color: var(--verde-oscuro);
-    text-align: center;
-}
-
-.progreso-number:focus {
-    outline: none;
-    border-color: var(--verde);
-    box-shadow: 0 0 0 3px rgba(0, 153, 51, 0.15);
-}
-
-.progreso-bar-preview {
-    height: 10px;
-    background: #eee;
-    border-radius: 8px;
-    overflow: hidden;
-    margin-bottom: 6px;
-}
-
-.progreso-bar-fill {
-    height: 100%;
-    background: var(--verde);
-    border-radius: 8px;
-    transition: width 0.2s;
-}
-
-.progreso-label {
-    font-size: 0.8rem;
-    color: #888;
-}
 
 .panel-save-toast {
     display: flex;
@@ -1023,8 +939,7 @@
         grid-template-columns: 1fr;
     }
 
-    .panel-editar,
-    .panel-progreso {
+    .panel-editar {
         padding: 20px 16px;
     }
 
