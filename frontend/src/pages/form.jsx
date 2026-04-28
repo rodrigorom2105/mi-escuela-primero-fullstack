@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Navbar from '../components/navbar'
 import Footer from '../components/footer'
 import '../styles/form.css'
-import { submitDonacion } from '../services/api'
+import { submitDonacion, getEscuelas } from '../services/api'
 
 const mapCategoriaToDonationType = (proyecto) => {
   if (!proyecto) return ''
@@ -56,14 +56,22 @@ function Form() {
   const navigate  = useNavigate()
   const proyectoContext = location.state?.proyecto || null
 
-  const [entityType,   setEntityType]   = useState('')
-  const [donationType, setDonationType] = useState(mapCategoriaToDonationType(proyectoContext))
-  const [logistics,    setLogistics]    = useState('')
-  const [errors,       setErrors]       = useState({})
-  const [touched,      setTouched]      = useState({})
-  const [showPrivacy,  setShowPrivacy]  = useState(false)
-  const [submitting,   setSubmitting]   = useState(false)
-  const [submitError,  setSubmitError]  = useState(null)
+  const [entityType,        setEntityType]        = useState('')
+  const [donationType,      setDonationType]      = useState(mapCategoriaToDonationType(proyectoContext))
+  const [logistics,         setLogistics]         = useState('')
+  const [destinationSchool, setDestinationSchool] = useState(proyectoContext?.escuela || '')
+  const [escuelas,          setEscuelas]          = useState([])
+  const [errors,            setErrors]            = useState({})
+  const [touched,           setTouched]           = useState({})
+  const [showPrivacy,       setShowPrivacy]       = useState(false)
+  const [submitting,        setSubmitting]        = useState(false)
+  const [submitError,       setSubmitError]       = useState(null)
+
+  useEffect(() => {
+    getEscuelas()
+      .then(data => setEscuelas(data || []))
+      .catch(() => {})
+  }, [])
 
   const showInstanceGroup  = entityType !== '' && entityType !== 'ninguna'
   const showDetailsSection = donationType !== ''
@@ -407,18 +415,22 @@ function Form() {
 
                 <div className="form-group">
                   <label htmlFor="destination-school">
-                    Escuela(s) destino <span className="req-mark" aria-hidden="true">*</span>
+                    Escuela destino <span className="req-mark" aria-hidden="true">*</span>
                   </label>
-                  <input
-                    type="text"
+                  <select
                     id="destination-school"
                     name="destination-school"
-                    placeholder="Nombre de la escuela"
-                    defaultValue={proyectoContext?.escuela || ''}
+                    value={destinationSchool}
+                    onChange={e => setDestinationSchool(e.target.value)}
                     className={fieldClass('destination-school')}
                     onBlur={handleBlur}
                     {...ariaProps('destination-school')}
-                  />
+                  >
+                    <option value="" disabled>Selecciona una escuela</option>
+                    {escuelas.map(e => (
+                      <option key={e.id} value={e.nombre}>{e.nombre}</option>
+                    ))}
+                  </select>
                   <FieldError name="destination-school" errors={errors} touched={touched} />
                 </div>
 
