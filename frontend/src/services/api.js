@@ -8,9 +8,9 @@ async function apiFetch(path, options = {}) {
   return body
 }
 
-export const getNecesidades   = ()    => apiFetch('/needs')
-export const getNecesidadById = (id)  => apiFetch(`/needs/${id}`)
-export const getEscuelas      = ()    => apiFetch('/schools')
+export const getNecesidades   = ()    => apiFetch('/necesidades')
+export const getNecesidadById = (id)  => apiFetch(`/necesidades/${id}`)
+export const getEscuelas      = ()    => apiFetch('/escuelas')
 export const getPlanteles     = ()    => apiFetch('/planteles')
 export const getMunicipios    = ()    => apiFetch('/municipios')
 export const getCategorias    = ()    => apiFetch('/categorias')
@@ -34,10 +34,10 @@ export const getDonaciones = (token) =>
   apiFetch('/donaciones', { headers: { Authorization: `Bearer ${token}` } })
 
 export const getDonacionesByNecesidad = (needId) =>
-  apiFetch(`/needs/${needId}/donaciones`)
+  apiFetch(`/necesidades/${needId}/donaciones`)
 
 export const getProgresoNecesidades = () =>
-  apiFetch('/needs/progreso')
+  apiFetch('/necesidades/progreso')
 
 export const getAliados = (token) =>
   apiFetch('/aliados', { headers: { Authorization: `Bearer ${token}` } })
