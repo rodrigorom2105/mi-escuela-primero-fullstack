@@ -16,16 +16,13 @@ REST API for the Mi Escuela Primero project, built with **Express**, **TypeScrip
 
 ## Architecture
 
-This project follows a **4-layer architecture**: Route → Controller → Service → Repository. Each layer has a single responsibility, and data flows strictly downward — no layer skips another.
+This project follows a **layered architecture**: Route → Service → Repository. Data flows strictly downward — no layer skips another.
 
 ```
 HTTP Request
      |
      v
 [ Router ]          src/routes/
-     |
-     v
-[ Controller ]      src/controllers/
      |
      v
 [ Service ]         src/services/
@@ -39,6 +36,8 @@ HTTP Request
      v
   Database (PostgreSQL via Supabase)
 ```
+
+> **Note:** Routes that require custom HTTP logic (e.g. `auth.routes.ts`, `donaciones.controller.ts`) use a dedicated `src/controllers/` layer between the router and the service. Standard CRUD routes skip this layer and use `crud-handlers` directly (see below).
 
 ---
 
@@ -63,30 +62,58 @@ app.listen(port, ...)
 
 ### 1. Router — `src/routes/`
 
-Maps HTTP methods and URL paths to specific controller functions. No logic lives here.
+Maps HTTP methods and URL paths to handler functions using `crud-handlers` factories (see below). No business logic lives here.
 
+```ts
+escuelasRouter.get("/",    makeGetAll(listEscuelas))
+escuelasRouter.get("/:id", makeGetById(findEscuelaById))
+escuelasRouter.post("/",   requireAuth, makeCreate(createEscuela))
 ```
-GET  /escuelas       → getEscuelasController
-GET  /escuelas/:id   → getEscuelaByIdController
-POST /escuelas       → createEscuelaController
-```
-
-**File:** `src/routes/escuelas.routes.ts`
 
 ---
 
-### 2. Controller — `src/controllers/`
+### 2. `crud-handlers` — `src/lib/crud-handlers.ts`
 
-Handles the HTTP boundary. Each controller function:
-- Receives the raw `Request` and `Response` objects from Express.
-- Parses and validates input from `req.params`, `req.body`, etc.
-- Calls the appropriate service function.
-- Sends the HTTP response (status code + JSON body).
-- Catches errors and returns meaningful error responses.
+A set of **factory functions** that eliminate boilerplate from route definitions. Each factory wraps a service call in a consistent Express handler: it parses inputs, calls the service, and returns the appropriate HTTP response (including error handling).
 
-Controllers know about HTTP — services and repositories do not.
+Every route in the project uses one of these factories, keeping route files concise and uniform.
 
-**File:** `src/controllers/escuelas.controller.ts`
+#### Available factories
+
+| Factory | HTTP verb | Service signature | Success response |
+|---|---|---|---|
+| `makeGetAll(service)` | `GET /` | `() => Promise<T[]>` | `200` + array |
+| `makeGetById(service, parseId?)` | `GET /:id` | `(id) => Promise<T \| null>` | `200` + object, `404` if null |
+| `makeCreate(service, status?)` | `POST /` | `(body) => Promise<T>` | `201` + object |
+| `makeCreateNested(service, parseId?)` | `POST /:id/sub` | `(id, body) => Promise<T \| null>` | `201` + object, `404` if null |
+| `makeUpdate(service, parseId?)` | `PATCH /:id` | `(id, body) => Promise<T>` | `200` + object |
+| `makeDelete(service, parseId?)` | `DELETE /:id` | `(id) => Promise<void>` | `204` no content |
+
+#### `parseId` parameter
+
+By default all factories parse the URL `:id` segment with `Number`. Pass `String` as the second argument when the primary key is a UUID or string:
+
+```ts
+aliadosRouter.get("/:id", makeGetById(findAliadoById, String))
+```
+
+#### `makeCreateNested`
+
+Used for routes like `POST /:id/needs` where the handler needs both the parent resource ID and the request body:
+
+```ts
+escuelasRouter.post("/:id/needs", requireAuth, makeCreateNested(addNecesidadToEscuela))
+// addNecesidadToEscuela(escuelaId, body) → null if parent not found → 404
+```
+
+#### Error handling
+
+| Situation | Status |
+|---|---|
+| Invalid (non-numeric) id | `400` |
+| Resource not found (service returns `null`) | `404` |
+| Validation / business error (service throws) | `400` |
+| Unexpected server error | `500` |
 
 ---
 
@@ -94,12 +121,17 @@ Controllers know about HTTP — services and repositories do not.
 
 Contains the **business logic** of the application. Service functions:
 - Orchestrate calls to one or more repository functions.
-- Apply any rules, transformations, or validations that go beyond raw data access.
+- Apply rules, transformations, or validations beyond raw data access.
 - Are fully decoupled from HTTP (no `Request`/`Response` objects).
 
-Currently the service layer is thin (the domain is simple), but this is where logic like filtering, combining data from multiple tables, or enforcing business rules would live.
-
-**File:** `src/services/escuelas.service.ts`
+```ts
+// src/services/necesidades.service.ts
+export async function addNecesidadToEscuela(escuelaId: number, body: Record<string, unknown>) {
+  const escuela = await getEscuelaById(escuelaId)
+  if (!escuela) return null                                   // parent not found → route returns 404
+  return createNecesidad({ ...body, plantel_id: escuela.plantel_id })
+}
+```
 
 ---
 
@@ -108,14 +140,11 @@ Currently the service layer is thin (the domain is simple), but this is where lo
 The only layer that talks to the database. Repository functions:
 - Use the Supabase client to run queries.
 - Return raw data or throw errors — no HTTP concerns, no business logic.
-- Keep all SQL/query logic in one place, making it easy to swap the data source later.
 
 ```ts
 // Example: fetch a single school by primary key
 supabase.from("escuelas").select("*").eq("id", id).maybeSingle()
 ```
-
-**File:** `src/repositories/escuelas.repository.ts`
 
 ---
 
@@ -138,15 +167,14 @@ The client is created with `createClient` from `@supabase/supabase-js` and expor
 src/
 ├── index.ts                        # Entry point, server setup
 ├── lib/
-│   └── supabase.ts                 # Supabase client instance
-├── routes/
-│   └── escuelas.routes.ts          # URL → controller mappings
-├── controllers/
-│   └── escuelas.controller.ts      # HTTP parsing & response
-├── services/
-│   └── escuelas.service.ts         # Business logic
-└── repositories/
-    └── escuelas.repository.ts      # Database queries
+│   ├── supabase.ts                 # Supabase client instance
+│   └── crud-handlers.ts            # Route handler factories
+├── middleware/
+│   └── auth.middleware.ts          # requireAuth guard
+├── routes/                         # URL → handler mappings
+├── controllers/                    # HTTP layer for complex routes
+├── services/                       # Business logic
+└── repositories/                   # Database queries
 ```
 
 ---

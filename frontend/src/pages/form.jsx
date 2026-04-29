@@ -187,8 +187,8 @@ function Form() {
       await submitDonacion({
         aliado: aliadoPayload,
         donacion: donacionPayload,
-        necesidades: proyectoContext?.id ? [{ id: proyectoContext.id }] : [],
-        escuelas: proyectoContext?.escuelaId ? [proyectoContext.escuelaId] : [],
+        necesidad_id: proyectoContext?.id ?? null,
+        escuela_id: proyectoContext?.escuelaId ?? null,
       })
 
       navigate('/gracias', {

@@ -60,3 +60,18 @@ export function makeDelete(service: (id: any) => Promise<void>, parseId: (s: str
     }
   }
 }
+
+// For POST /:id/sub-resource — passes (id, body) to the service and returns 404 if the parent is not found.
+export function makeCreateNested(service: (id: any, body: Record<string, unknown>) => Promise<unknown>, parseId: (s: string) => any = Number) {
+  return async (req: Request, res: Response) => {
+    try {
+      const id = parseId(req.params.id as string)
+      if (parseId === Number && Number.isNaN(id)) return res.status(400).json({ error: "Invalid id" })
+      const record = await service(id, req.body ?? {})
+      if (!record) return res.status(404).json({ error: "Not found" })
+      return res.status(201).json(record)
+    } catch (err: any) {
+      return res.status(400).json({ error: err.message })
+    }
+  }
+}

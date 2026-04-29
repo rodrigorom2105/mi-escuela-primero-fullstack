@@ -8,25 +8,34 @@ export async function getDonacionNecesidades() {
 
 export async function getDonacionesByNecesidadId(necesidadId: number) {
   const { data, error } = await supabase
-    .from("donacion_necesidades")
-    .select("id, cantidad_cubierta, donaciones(estado, tipo_donativo, articulo_donar)")
-    .eq("necesidad_id", necesidadId)
+    .from("necesidades")
+    .select("*, donacion_necesidades(donaciones(*))")
+    .eq("id", necesidadId)
+    .maybeSingle()
   if (error) throw error
-  return data
+  if (!data) return null
+
+  const { donacion_necesidades, ...necesidad } = data as any
+  return {
+    ...necesidad,
+    donaciones: (donacion_necesidades ?? [])
+      .map((dn: any) => dn.donaciones)
+      .filter(Boolean),
+  }
 }
 
 export async function getProgresoAllNecesidades() {
   const { data, error } = await supabase
     .from("donacion_necesidades")
-    .select("necesidad_id, cantidad_cubierta, donaciones(estado)")
+    .select("necesidad_id, donaciones(estado, cantidad)")
   if (error) throw error
 
   const map: Record<number, number> = {}
   for (const row of data ?? []) {
-    const donacion = (Array.isArray(row.donaciones) ? row.donaciones[0] : row.donaciones) as { estado: string } | null
+    const donacion = (Array.isArray(row.donaciones) ? row.donaciones[0] : row.donaciones) as { estado: string; cantidad: number } | null
     if (donacion?.estado === "completada") {
       const nid = row.necesidad_id
-      map[nid] = (map[nid] ?? 0) + Number(row.cantidad_cubierta ?? 0)
+      map[nid] = (map[nid] ?? 0) + Number(donacion.cantidad ?? 0)
     }
   }
   return Object.entries(map).map(([need_id, cantidad_cubierta]) => ({

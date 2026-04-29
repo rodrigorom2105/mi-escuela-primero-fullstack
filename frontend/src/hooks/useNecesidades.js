@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import {
-  getNecesidades, getNecesidadById,
+  getNecesidades,
   getEscuelas, getPlanteles, getMunicipios,
   getCategorias, getSubcategorias,
   getDonacionesByNecesidad, getProgresoNecesidades,
@@ -29,10 +29,10 @@ function buildLookups(escuelas, planteles, municipios, categorias, subcategorias
 }
 
 function calcularProgreso(donaciones, cantidadNecesaria) {
-  if (!cantidadNecesaria) return 0
+  if (!cantidadNecesaria || !Array.isArray(donaciones)) return 0
   const donado = donaciones
-    .filter(d => d.donaciones?.estado === 'completada')
-    .reduce((sum, d) => sum + (Number(d.cantidad_cubierta) || 0), 0)
+    .filter(d => d.estado === 'completada')
+    .reduce((sum, d) => sum + (Number(d.cantidad) || 0), 0)
   return Math.min(100, Math.round((donado / cantidadNecesaria) * 100))
 }
 
@@ -115,12 +115,12 @@ export function useNecesidadById(id) {
     setError(null)
 
     Promise.all([
-      getNecesidadById(Number(id)),
+      getDonacionesByNecesidad(Number(id)).catch(() => null),
       fetchLookups(),
-      getDonacionesByNecesidad(Number(id)).catch(() => []),
     ])
-      .then(([need, [escuelas, planteles, municipios, categorias, subcategorias], donaciones]) => {
-        if (!need) { setData(null); return }
+      .then(([needWithDonaciones, [escuelas, planteles, municipios, categorias, subcategorias]]) => {
+        if (!needWithDonaciones) { setData(null); return }
+        const { donaciones = [], ...need } = needWithDonaciones
         const lookups = buildLookups(escuelas, planteles, municipios, categorias, subcategorias)
         setData(mapNecesidad(need, lookups, donaciones))
       })
