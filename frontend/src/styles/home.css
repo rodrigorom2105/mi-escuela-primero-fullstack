@@ -12,12 +12,16 @@
   background-image:
     radial-gradient(ellipse at 18% 65%, rgba(0, 210, 75, 0.18) 0%, transparent 55%),
     radial-gradient(ellipse at 82% 15%, rgba(0, 20, 8, 0.45) 0%, transparent 50%),
-    linear-gradient(148deg, #003010 0%, #006622 50%, #004d1a 100%);
+    linear-gradient(148deg, rgba(0, 48, 16, 0.82) 0%, rgba(0, 102, 34, 0.78) 50%, rgba(0, 77, 26, 0.82) 100%),
+    url('../assets/heroBg.webp');
   color: var(--blanco);
+  background-size: cover;
+  background-position: center;
   padding: 60px 24px;
   display: flex;
   align-items: center;
 }
+
 
 .hero-content {
   width: 100%;
