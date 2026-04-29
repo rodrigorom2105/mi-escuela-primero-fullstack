@@ -3,7 +3,7 @@ import Navbar from '../components/navbar'
 import Footer from '../components/footer'
 import '../styles/admin.css'
 import { useNecesidades } from '../hooks/useNecesidades'
-import { loginAdmin, getDonaciones, getAliados, updateDonacionEstado } from '../services/api'
+import { loginAdmin, getDonaciones, getDonacionesEconomicas, getAliados, updateDonacionEstado, updateDonacionEconomicaEstado } from '../services/api'
 
 const CATEGORY_ICONS = {
   Material:       'bi-box-seam',
@@ -40,6 +40,13 @@ const TIPO_INSTANCIA_LABEL = {
   sin_instancia:        'Sin instancia',
   otro:                 'Otro',
 }
+const FRECUENCIA_LABEL = {
+  unica:      'Donación única',
+  mensual:    'Mensual',
+  trimestral: 'Trimestral',
+  anual:      'Anual',
+}
+
 const TIPO_DONATIVO_LABEL = {
   formacion_familias:       'Formación para familias',
   formacion_estudiantes:    'Formación para estudiantes',
@@ -60,7 +67,7 @@ const TIPO_DONATIVO_LABEL = {
 }
 
 function mapAppFromBackend(donacion, aliadoMap) {
-  const aliado = aliadoMap[donacion.aliado_id] || {}
+  const aliado = donacion.aliado || aliadoMap[donacion.aliado_id] || {}
   return {
     id:              donacion.id,
     nombre:          aliado.nombre_completo      || '—',
@@ -70,7 +77,7 @@ function mapAppFromBackend(donacion, aliadoMap) {
     celular:         aliado.celular              || '—',
     municipio:       aliado.municipio_estado     || '—',
     tipoDonativo:    TIPO_DONATIVO_LABEL[donacion.tipo_donativo] || donacion.tipo_donativo || '—',
-    escuelaDestino:  '—',
+    escuelaDestino:  donacion.escuela?.nombre    || '—',
     articulo:        donacion.articulo_donar     || null,
     cantidad:        donacion.cantidad           || null,
     temaFormacion:   donacion.tema_formacion     || null,
@@ -78,6 +85,30 @@ function mapAppFromBackend(donacion, aliadoMap) {
     fecha:           donacion.created_at ? donacion.created_at.slice(0, 10) : '—',
     _dbId:           donacion.id,
     _dbEstado:       donacion.estado,
+    _tipo:           'material',
+  }
+}
+
+function mapEconomicaFromBackend(don) {
+  const aliado = don.aliado || {}
+  return {
+    id:              don.id,
+    nombre:          aliado.nombre_completo      || '—',
+    instancia:       TIPO_INSTANCIA_LABEL[aliado.tipo_instancia] || aliado.tipo_instancia || '—',
+    nombreInstancia: aliado.nombre_instancia     || null,
+    correo:          aliado.correo_electronico   || '—',
+    celular:         aliado.celular              || '—',
+    municipio:       aliado.municipio_estado     || '—',
+    tipoDonativo:    'Monetario',
+    escuelaDestino:  don.escuela?.nombre         || 'General',
+    monto:           don.monto_aproximado        || null,
+    frecuencia:      don.frecuencia              || null,
+    mensaje:         don.mensaje                 || null,
+    estado:          ESTADO_LABEL[don.estado]    || don.estado || 'Pendiente',
+    fecha:           don.created_at ? don.created_at.slice(0, 10) : '—',
+    _dbId:           don.id,
+    _dbEstado:       don.estado,
+    _tipo:           'economica',
   }
 }
 
@@ -186,14 +217,18 @@ function AdminContent({ token, onLogout }) {
     if (proyectosAPI.length > 0) setProyectos(proyectosAPI)
   }, [proyectosAPI])
 
-  // Fetch donaciones + aliados on mount
+  // Fetch donaciones + donaciones económicas + aliados on mount
   useEffect(() => {
     setLoadingApps(true)
-    Promise.all([getDonaciones(token), getAliados(token)])
-      .then(([donaciones, aliados]) => {
+    Promise.all([getDonaciones(token), getDonacionesEconomicas(token), getAliados(token)])
+      .then(([donaciones, economicas, aliados]) => {
         const aliadoMap = {}
         aliados.forEach(a => { aliadoMap[a.id] = a })
-        setApps(donaciones.map(d => mapAppFromBackend(d, aliadoMap)))
+        const mapped = [
+          ...donaciones.map(d => mapAppFromBackend(d, aliadoMap)),
+          ...economicas.map(d => mapEconomicaFromBackend(d)),
+        ].sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
+        setApps(mapped)
       })
       .catch(err => setAppsError(err.message))
       .finally(() => setLoadingApps(false))
@@ -234,8 +269,10 @@ function AdminContent({ token, onLogout }) {
   // ── Status change ────────────────────────────────────────────────────────
   const handleStatusChange = async (id, nuevoEstado) => {
     const dbEstado = ESTADO_DB[nuevoEstado] || 'pendiente'
+    const app = apps.find(a => a.id === id)
+    const updateFn = app?._tipo === 'economica' ? updateDonacionEconomicaEstado : updateDonacionEstado
     try {
-      await updateDonacionEstado(id, dbEstado, token)
+      await updateFn(id, dbEstado, token)
       setApps(prev => prev.map(a => a.id === id ? { ...a, estado: nuevoEstado } : a))
       if (aplicacionDetalle?.id === id) {
         setAplicacionDetalle(prev => ({ ...prev, estado: nuevoEstado }))
@@ -688,9 +725,12 @@ function AdminContent({ token, onLogout }) {
                       ['Municipio',        aplicacionDetalle.municipio],
                       ['Tipo de donativo', aplicacionDetalle.tipoDonativo],
                       ['Escuela destino',  aplicacionDetalle.escuelaDestino],
-                      aplicacionDetalle.articulo      ? ['Artículo',          aplicacionDetalle.articulo]      : null,
-                      aplicacionDetalle.cantidad      ? ['Cantidad',          aplicacionDetalle.cantidad]      : null,
-                      aplicacionDetalle.temaFormacion ? ['Tema de formación', aplicacionDetalle.temaFormacion] : null,
+                      aplicacionDetalle.articulo      ? ['Artículo',          aplicacionDetalle.articulo]                                          : null,
+                      aplicacionDetalle.cantidad      ? ['Cantidad',          aplicacionDetalle.cantidad]                                          : null,
+                      aplicacionDetalle.temaFormacion ? ['Tema de formación', aplicacionDetalle.temaFormacion]                                     : null,
+                      aplicacionDetalle.monto         ? ['Monto aproximado',  `$${Number(aplicacionDetalle.monto).toLocaleString('es-MX')} MXN`]  : null,
+                      aplicacionDetalle.frecuencia    ? ['Frecuencia',        FRECUENCIA_LABEL[aplicacionDetalle.frecuencia] || aplicacionDetalle.frecuencia] : null,
+                      aplicacionDetalle.mensaje       ? ['Mensaje',           aplicacionDetalle.mensaje]                                           : null,
                       ['Fecha',            aplicacionDetalle.fecha],
                     ].filter(Boolean).map(([label, value]) => (
                       <div className="detalle-grupo" key={label}>

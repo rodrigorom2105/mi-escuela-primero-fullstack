@@ -4,7 +4,7 @@ import Navbar from '../components/navbar'
 import Footer from '../components/footer'
 import PrivacyModal from '../components/PrivacyModal'
 import '../styles/form.css'
-import { getEscuelas } from '../services/api'
+import { getEscuelas, submitDonacionEconomica } from '../services/api'
 
 const VALIDATORS = {
   'full-name': v => v.trim() ? '' : 'Ingresa tu nombre completo',
@@ -32,8 +32,9 @@ function FormEconomica() {
   const [escuelas,   setEscuelas]   = useState([])
   const [errors,     setErrors]     = useState({})
   const [touched,    setTouched]    = useState({})
-  const [showPrivacy, setShowPrivacy] = useState(false)
-  const [submitting,  setSubmitting]  = useState(false)
+  const [showPrivacy,  setShowPrivacy]  = useState(false)
+  const [submitting,   setSubmitting]   = useState(false)
+  const [submitError,  setSubmitError]  = useState(null)
 
   useEffect(() => {
     getEscuelas()
@@ -51,7 +52,16 @@ function FormEconomica() {
     if (validate) setErrors(prev => ({ ...prev, [name]: validate(val) }))
   }
 
-  const handleSubmit = (e) => {
+  const TIPO_INSTANCIA_MAP = {
+    empresa:  'empresa',
+    osc:      'osc',
+    educativa:'institucion_educativa',
+    gobierno: 'gobierno_municipal',
+    ninguna:  'sin_instancia',
+    otro:     'otro',
+  }
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
     const formData = new FormData(e.target)
 
@@ -78,17 +88,48 @@ function FormEconomica() {
       return
     }
 
-    // TODO: integrar con backend cuando esté disponible el endpoint de donaciones económicas.
+    const rawEntityType  = formData.get('entity-type') || ''
+    const rawAmount      = formData.get('amount')
+    const rawFrequency   = formData.get('frequency')
+    const rawEscuelaId   = formData.get('destination-school')
+    const rawMensaje     = formData.get('message')
+
+    const escuelaSeleccionada = escuelas.find(e => String(e.id) === rawEscuelaId)
+
+    const payload = {
+      aliado: {
+        nombre_completo:    formData.get('full-name'),
+        tipo_instancia:     TIPO_INSTANCIA_MAP[rawEntityType] || 'otro',
+        nombre_instancia:   formData.get('instance-name') || null,
+        correo_electronico: formData.get('email'),
+        celular:            formData.get('phone'),
+        municipio_estado:   formData.get('location'),
+      },
+      donacion: {
+        monto_aproximado: rawAmount      ? parseFloat(rawAmount)   : null,
+        frecuencia:       rawFrequency   ? rawFrequency            : null,
+        escuela_id:       rawEscuelaId   ? parseInt(rawEscuelaId)  : null,
+        mensaje:          rawMensaje     ? rawMensaje.trim()       : null,
+      },
+    }
+
     setSubmitting(true)
-    navigate('/gracias', {
-      state: {
-        summary: {
-          nombre: formData.get('full-name'),
-          escuela: formData.get('destination-school') || null,
-          tipo: 'Donación económica',
+    setSubmitError(null)
+    try {
+      await submitDonacionEconomica(payload)
+      navigate('/gracias', {
+        state: {
+          summary: {
+            nombre: formData.get('full-name'),
+            escuela: escuelaSeleccionada?.nombre || null,
+            tipo: 'Donación económica',
+          }
         }
-      }
-    })
+      })
+    } catch {
+      setSubmitError('Ocurrió un error al enviar tu solicitud. Por favor intenta de nuevo.')
+      setSubmitting(false)
+    }
   }
 
   const fieldClass = (name) =>
@@ -273,7 +314,7 @@ function FormEconomica() {
                 <select id="destination-school" name="destination-school" defaultValue="">
                   <option value="">Sin preferencia</option>
                   {escuelas.map(e => (
-                    <option key={e.id} value={e.nombre}>{e.nombre}</option>
+                    <option key={e.id} value={e.id}>{e.nombre}</option>
                   ))}
                 </select>
                 <span className="form-hint">Si tu donación está pensada para una escuela específica, indícala aquí.</span>
@@ -330,6 +371,12 @@ function FormEconomica() {
             </div>
 
             <div className="form-submit">
+              {submitError && (
+                <p className="field-error" role="alert">
+                  <i className="bi bi-exclamation-circle me-1" aria-hidden="true" />
+                  {submitError}
+                </p>
+              )}
               <p className="form-required-note">
                 <span className="req-mark">*</span> Campos obligatorios
               </p>

@@ -11,7 +11,7 @@ import { subcategoriasRouter } from "./routes/subcategorias.routes"
 import { necesidadesRouter } from "./routes/necesidades.routes"
 import { aliadosRouter } from "./routes/aliados.routes"
 import { donacionNecesidadesRouter } from "./routes/donacion-necesidades.routes"
-import { donacionEscuelasRouter } from "./routes/donacion-escuelas.routes"
+import { donacionesEconomicasRouter } from "./routes/donaciones-economicas.routes"
 
 const app = express()
 const port = process.env.PORT ?? 3000
@@ -33,7 +33,7 @@ app.use("/subcategorias", subcategoriasRouter)
 app.use("/necesidades", necesidadesRouter)
 app.use("/aliados", aliadosRouter)
 app.use("/donacion-necesidades", donacionNecesidadesRouter)
-app.use("/donacion-escuelas", donacionEscuelasRouter)
+app.use("/donaciones-economicas", donacionesEconomicasRouter)
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`)
