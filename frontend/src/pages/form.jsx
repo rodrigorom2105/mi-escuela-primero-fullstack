@@ -59,7 +59,7 @@ function Form() {
   const [entityType,        setEntityType]        = useState('')
   const [donationType,      setDonationType]      = useState(mapCategoriaToDonationType(proyectoContext))
   const [logistics,         setLogistics]         = useState('')
-  const [destinationSchool, setDestinationSchool] = useState(proyectoContext?.escuela || '')
+  const [destinationSchool, setDestinationSchool] = useState(proyectoContext?.escuela_id ? String(proyectoContext.escuela_id) : '')
   const [escuelas,          setEscuelas]          = useState([])
   const [errors,            setErrors]            = useState({})
   const [touched,           setTouched]           = useState({})
@@ -184,18 +184,21 @@ function Form() {
     setSubmitting(true)
     setSubmitError(null)
     try {
+      const rawEscuelaId = formData.get('destination-school') || ''
+      const escuelaSeleccionada = escuelas.find(e => String(e.id) === rawEscuelaId)
+
       await submitDonacion({
         aliado: aliadoPayload,
         donacion: donacionPayload,
         necesidad_id: proyectoContext?.id ?? null,
-        escuela_id: proyectoContext?.escuelaId ?? null,
+        escuela_id: rawEscuelaId ? parseInt(rawEscuelaId) : null,
       })
 
       navigate('/gracias', {
         state: {
           summary: {
             nombre: formData.get('full-name'),
-            escuela: formData.get('destination-school') || proyectoContext?.escuela,
+            escuela: escuelaSeleccionada?.nombre || proyectoContext?.escuela || null,
             tipo: rawDonationType,
           }
         }
@@ -428,7 +431,7 @@ function Form() {
                   >
                     <option value="" disabled>Selecciona una escuela</option>
                     {escuelas.map(e => (
-                      <option key={e.id} value={e.nombre}>{e.nombre}</option>
+                      <option key={e.id} value={String(e.id)}>{e.nombre}</option>
                     ))}
                   </select>
                   <FieldError name="destination-school" errors={errors} touched={touched} />

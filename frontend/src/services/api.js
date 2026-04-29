@@ -23,6 +23,13 @@ export const submitDonacion = (data) =>
     body: JSON.stringify(data),
   })
 
+export const submitDonacionEconomica = (data) =>
+  apiFetch('/donaciones-economicas/submit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+
 export const loginAdmin = (email, password) =>
   apiFetch('/auth/login', {
     method: 'POST',
@@ -32,6 +39,9 @@ export const loginAdmin = (email, password) =>
 
 export const getDonaciones = (token) =>
   apiFetch('/donaciones', { headers: { Authorization: `Bearer ${token}` } })
+
+export const getDonacionesEconomicas = (token) =>
+  apiFetch('/donaciones-economicas', { headers: { Authorization: `Bearer ${token}` } })
 
 export const getDonacionesByNecesidad = (needId) =>
   apiFetch(`/necesidades/${needId}/donaciones`)
@@ -45,9 +55,13 @@ export const getAliados = (token) =>
 export const updateDonacionEstado = (id, estado, token) =>
   apiFetch(`/donaciones/${id}`, {
     method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ estado }),
+  })
+
+export const updateDonacionEconomicaEstado = (id, estado, token) =>
+  apiFetch(`/donaciones-economicas/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     body: JSON.stringify({ estado }),
   })
