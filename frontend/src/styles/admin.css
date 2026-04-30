@@ -368,6 +368,7 @@
 /* ── EXCEL UPLOAD TAB ── */
 .tab-cargar {
     max-width: 640px;
+    margin: 0 auto;
 }
 
 .cargar-card {
@@ -963,6 +964,115 @@
 
     .detalle-aplicacion {
         padding: 20px 16px;
+    }
+}
+
+/* ── GOOGLE SHEETS CARD ── */
+.google-sheets-card {
+    padding: 48px 36px;
+    text-align: center;
+}
+
+.sheets-icon-container {
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: center;
+}
+
+.sheets-icon {
+    width: 80px;
+    height: 80px;
+    filter: drop-shadow(0 4px 12px rgba(52, 168, 83, 0.3));
+}
+
+.cargar-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 12px;
+    margin-top: 0;
+}
+
+.cargar-desc {
+    font-size: 1rem;
+    color: #6b7280;
+    line-height: 1.6;
+    margin-bottom: 32px;
+}
+
+.cargar-info {
+    background: #f0f9ff;
+    border-left: 4px solid #34A853;
+    padding: 16px;
+    margin-bottom: 32px;
+    border-radius: 6px;
+    text-align: left;
+}
+
+.cargar-info strong {
+    display: block;
+    color: #34A853;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.cargar-info p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.btn-sheets-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: linear-gradient(135deg, #34A853 0%, #2d8645 100%);
+    color: white;
+    padding: 16px 32px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(52, 168, 83, 0.3);
+    border: none;
+    cursor: pointer;
+}
+
+.btn-sheets-link:hover {
+    background: linear-gradient(135deg, #2d8645 0%, #25693d 100%);
+    box-shadow: 0 6px 20px rgba(52, 168, 83, 0.4);
+    transform: translateY(-2px);
+}
+
+.btn-sheets-link:active {
+    transform: translateY(0);
+}
+
+.sheets-logo {
+    width: 24px;
+    height: 24px;
+}
+
+@media (max-width: 640px) {
+    .google-sheets-card {
+        padding: 32px 20px;
+    }
+
+    .sheets-icon {
+        width: 60px;
+        height: 60px;
+    }
+
+    .cargar-title {
+        font-size: 1.5rem;
+    }
+
+    .btn-sheets-link {
+        padding: 14px 24px;
+        font-size: 0.95rem;
     }
 }
 

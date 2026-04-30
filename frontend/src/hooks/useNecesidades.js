@@ -28,6 +28,15 @@ function buildLookups(escuelas, planteles, municipios, categorias, subcategorias
   return { escuelasByPlantelId, planteleById, municipioById, subcategoriaById, categoriaById }
 }
 
+function getPrioridadLabel(priorityValue) {
+  if (!priorityValue) return null
+  const numValue = Number(priorityValue)
+  if (numValue >= 3) return 'Alta'
+  if (numValue === 2) return 'Media'
+  if (numValue === 1) return 'Baja'
+  return null
+}
+
 function calcularProgreso(donaciones, cantidadNecesaria) {
   if (!cantidadNecesaria || !Array.isArray(donaciones)) return 0
   const donado = donaciones
@@ -54,7 +63,7 @@ function mapNecesidad(n, lookups, donaciones = []) {
     cantidad:       n.cantidad,
     unidad:         n.unidad,
     estado:         n.estado,
-    prioridad:      null,
+    prioridad:      getPrioridadLabel(n.priority),
     progreso:       calcularProgreso(donaciones, n.cantidad),
     beneficiarios:  escuela.estudiantes || 0,
     imagenPrincipal: plantel.imagen_url || DEFAULT_IMAGE,
