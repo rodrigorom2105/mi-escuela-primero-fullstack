@@ -339,7 +339,7 @@ function AdminContent({ token, onLogout }) {
     { key: 'resumen',       icon: 'bi-grid-1x2', label: 'Resumen' },
     { key: 'proyectos',     icon: 'bi-building', label: 'Proyectos' },
     { key: 'aplicaciones',  icon: 'bi-inbox',    label: 'Aplicaciones' },
-    { key: 'cargar',        icon: 'bi-upload',   label: 'Cargar datos' },
+    { key: 'cargar',        icon: 'bi-file-spreadsheet', label: 'Google Sheets' },
   ]
 
   return (
@@ -856,62 +856,64 @@ function AdminContent({ token, onLogout }) {
           {/* ── CARGAR DATOS ── */}
           {tabActiva === 'cargar' && (
             <section className="tab-cargar">
-              <div className="cargar-card">
+              <div className="cargar-card google-sheets-card">
+                <div className="sheets-icon-container">
+                  <svg viewBox="0 0 48 48" className="sheets-icon" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="48" height="48" fill="#34A853" rx="6"/>
+                    <path d="M12 8h24c2.2 0 4 1.8 4 4v24c0 2.2-1.8 4-4 4H12c-2.2 0-4-1.8-4-4V12c0-2.2 1.8-4 4-4z" fill="#fff" opacity="0.2"/>
+                    <g fill="#fff">
+                      <rect x="14" y="14" width="6" height="6"/>
+                      <rect x="22" y="14" width="6" height="6"/>
+                      <rect x="30" y="14" width="6" height="6"/>
+                      <rect x="14" y="22" width="6" height="6"/>
+                      <rect x="22" y="22" width="6" height="6"/>
+                      <rect x="30" y="22" width="6" height="6"/>
+                      <rect x="14" y="30" width="6" height="6"/>
+                      <rect x="22" y="30" width="6" height="6"/>
+                      <rect x="30" y="30" width="6" height="6"/>
+                    </g>
+                  </svg>
+                </div>
+
                 <h3 className="cargar-title">
-                  <i className="bi bi-file-earmark-spreadsheet me-2" aria-hidden="true" />
-                  Cargar necesidades desde archivo
+                  Actualizar necesidades en tiempo real
                 </h3>
                 <p className="cargar-desc">
-                  Sube un archivo Excel (.xlsx, .xls) o CSV con las necesidades escolares.
-                  El archivo actualizará el catálogo de proyectos.
+                  Accede a la hoja de cálculo compartida para agregar, editar o actualizar
+                  las necesidades escolares. Los cambios se reflejarán automáticamente en el catálogo.
                 </p>
 
                 <div className="cargar-info">
                   <strong>
-                    <i className="bi bi-info-circle me-1" aria-hidden="true" />
-                    El archivo debe contener las columnas:
+                    <i className="bi bi-lightning-charge-fill me-1" aria-hidden="true" />
+                    Actualización en tiempo real
                   </strong>
-                  <ul>
-                    <li>escuela, municipio, categoria, subcategoria</li>
-                    <li>propuesta, cantidad, unidad, descripcion</li>
-                    <li>prioridad, progreso, beneficiarios (opcionales)</li>
-                  </ul>
+                  <p>Los cambios en Google Sheets se sincronizan automáticamente con la base de datos.</p>
                 </div>
 
-                <div className="cargar-form-group">
-                  <label htmlFor="archivo-datos">Seleccionar archivo</label>
-                  <input
-                    type="file"
-                    id="archivo-datos"
-                    accept=".xlsx,.xls,.csv"
-                    onChange={e => { setSelectedFile(e.target.files[0]); setUploadSuccess(false) }}
-                    className="cargar-input"
-                  />
-                </div>
-
-                {selectedFile && (
-                  <div className="cargar-file-info">
-                    <i className="bi bi-file-earmark me-2" aria-hidden="true" />
-                    <strong>{selectedFile.name}</strong>
-                    <span className="ms-2 text-muted">— {(selectedFile.size / 1024).toFixed(1)} KB</span>
-                  </div>
-                )}
-
-                {uploadSuccess && (
-                  <div className="cargar-success" role="status">
-                    <i className="bi bi-check-circle-fill me-2" aria-hidden="true" />
-                    Archivo cargado exitosamente. Los datos han sido actualizados.
-                  </div>
-                )}
-
-                <button
-                  className="btn-agregar"
-                  onClick={handleUpload}
-                  disabled={!selectedFile}
+                <a
+                  href="https://docs.google.com/spreadsheets/d/1PgwuFhPWz8DAVqUpJuOOmVtu-XAQ-nwhEaqflClZGz8/edit?gid=742880071#gid=742880071"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-sheets-link"
                 >
-                  <i className="bi bi-upload me-2" aria-hidden="true" />
-                  Subir archivo
-                </button>
+                  <svg className="sheets-logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="24" height="24" fill="#34A853" rx="3"/>
+                    <g fill="#fff">
+                      <rect x="5" y="5" width="3" height="3"/>
+                      <rect x="10" y="5" width="3" height="3"/>
+                      <rect x="15" y="5" width="3" height="3"/>
+                      <rect x="5" y="10" width="3" height="3"/>
+                      <rect x="10" y="10" width="3" height="3"/>
+                      <rect x="15" y="10" width="3" height="3"/>
+                      <rect x="5" y="15" width="3" height="3"/>
+                      <rect x="10" y="15" width="3" height="3"/>
+                      <rect x="15" y="15" width="3" height="3"/>
+                    </g>
+                  </svg>
+                  Abrir Google Sheets
+                  <i className="bi bi-arrow-up-right ms-2" aria-hidden="true" />
+                </a>
               </div>
             </section>
           )}

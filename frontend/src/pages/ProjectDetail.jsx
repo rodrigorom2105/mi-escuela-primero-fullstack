@@ -46,8 +46,8 @@ function ProjectDetail() {
   const getPriorityClass = (prioridad) => {
     if (!prioridad) return 'priority-normal';
     const p = prioridad.toLowerCase();
-    if (p === 'crítica') return 'priority-critical';
-    if (p === 'alta') return 'priority-high';
+    if (p === 'crítica' || p === 'alta') return 'priority-critical';
+    if (p === 'media') return 'priority-high';
     return 'priority-normal';
   };
 
