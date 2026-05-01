@@ -14,7 +14,6 @@ function Catalog() {
   const [municipio,    setMunicipio]    = useState('')
   const [categoria,    setCategoria]    = useState('')
   const [subcategoria, setSubcategoria] = useState('')
-  const [prioridad,    setPrioridad]    = useState('')
 
   const municipios    = [...new Set(necesidades.map(n => n.municipio).filter(Boolean))].sort()
   const categorias    = [...new Set(necesidades.map(n => n.categoria).filter(Boolean))].sort()
@@ -28,18 +27,16 @@ function Catalog() {
     const matchMunicipio    = municipio    === '' || item.municipio    === municipio
     const matchCategoria    = categoria   === '' || item.categoria    === categoria
     const matchSubcategoria = subcategoria === '' || item.subcategoria === subcategoria
-    const matchPrioridad    = prioridad   === '' || item.prioridad    === prioridad
-    return matchBusqueda && matchMunicipio && matchCategoria && matchSubcategoria && matchPrioridad
+    return matchBusqueda && matchMunicipio && matchCategoria && matchSubcategoria
   })
 
-  const hayFiltros = busqueda || municipio || categoria || subcategoria || prioridad
+  const hayFiltros = busqueda || municipio || categoria || subcategoria 
 
   const limpiarFiltros = () => {
     setBusqueda('')
     setMunicipio('')
     setCategoria('')
     setSubcategoria('')
-    setPrioridad('')
   }
 
   return (
@@ -126,19 +123,6 @@ function Catalog() {
                 </select>
               </div>
             )}
-
-            <div className="filtro-grupo">
-              <label htmlFor="prioridad">
-                <i className="bi bi-exclamation-circle me-1" aria-hidden="true" />
-                Prioridad
-              </label>
-              <select id="prioridad" value={prioridad} onChange={e => setPrioridad(e.target.value)}>
-                <option value="">Todas</option>
-                <option value="Alta">Alta</option>
-                <option value="Media">Media</option>
-                <option value="Baja">Baja</option>
-              </select>
-            </div>
 
             <button
               className={`btn-limpiar${hayFiltros ? ' btn-limpiar-active' : ''}`}
