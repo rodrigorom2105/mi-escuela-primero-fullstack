@@ -209,23 +209,6 @@
   justify-content: center;
 }
 
-/* Priority badge (floated over image) */
-.card-priority {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  display: inline-flex;
-  align-items: center;
-  font-size: 0.68rem;
-  font-weight: 700;
-  padding: 4px 9px;
-  border-radius: 20px;
-  white-space: nowrap;
-}
-
-.priority-alta  { background: #FFF0E8; color: var(--naranja); }
-.priority-media { background: #FFFBE8; color: #B07000; }
-.priority-baja  { background: var(--verde-claro); color: var(--verde-oscuro); }
 
 /* Card body */
 .card-body {
