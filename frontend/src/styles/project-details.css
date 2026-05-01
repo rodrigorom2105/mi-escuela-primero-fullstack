@@ -52,23 +52,6 @@
 .thumb:hover { transform: translateY(-3px); }
 .thumb.active { border-color: var(--verde); }
 
-/* PRIORIDAD TAGS */
-.priority-tag {
-    position: absolute;
-    top: 25px;
-    left: 25px;
-    padding: 8px 18px;
-    border-radius: 50px;
-    font-weight: 800;
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    color: white;
-    letter-spacing: 0.5px;
-    z-index: 2;
-}
-.priority-critical { background: #e74c3c; box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4); }
-.priority-high { background: var(--naranja); box-shadow: 0 5px 15px rgba(230, 126, 34, 0.3); }
-.priority-normal { background: var(--verde); }
 
 /* PANEL DE INFO RÁPIDA */
 .breadcrumb {

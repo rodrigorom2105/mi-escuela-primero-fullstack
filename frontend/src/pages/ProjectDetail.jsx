@@ -43,14 +43,6 @@ function ProjectDetail() {
     );
   }
 
-  const getPriorityClass = (prioridad) => {
-    if (!prioridad) return 'priority-normal';
-    const p = prioridad.toLowerCase();
-    if (p === 'crítica' || p === 'alta') return 'priority-critical';
-    if (p === 'media') return 'priority-high';
-    return 'priority-normal';
-  };
-
   const shareOnWhatsApp = () => {
     const url = window.location.href;
     const message = `Hola 👋, te comparto este proyecto educativo que necesita apoyo:
@@ -77,11 +69,7 @@ function ProjectDetail() {
           <div className="visual-grid">
             <div className="main-image-container">
               <img src={displayImg} alt={proyecto.propuesta} className="main-display-img" />
-              {proyecto.prioridad && (
-                <div className={`priority-tag ${getPriorityClass(proyecto.prioridad)}`}>
-                  Prioridad {proyecto.prioridad}
-                </div>
-              )}
+
             </div>
 
             {proyecto.galeria?.length > 0 && (

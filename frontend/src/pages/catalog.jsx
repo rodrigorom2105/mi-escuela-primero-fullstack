@@ -6,11 +6,6 @@ import { useNecesidades } from '../hooks/useNecesidades'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
-const PRIORITY_CLASS = {
-  'Alta':  'priority-alta',
-  'Media': 'priority-media',
-  'Baja':  'priority-baja',
-}
 
 function Catalog() {
   const { data: necesidades, loading, error } = useNecesidades()
@@ -214,12 +209,7 @@ function Catalog() {
                             e.currentTarget.parentElement.classList.add('card-img-fallback')
                           }}
                         />
-                        {item.prioridad && (
-                          <span className={`card-priority ${PRIORITY_CLASS[item.prioridad] ?? ''}`}>
-                            {item.prioridad === 'Alta' && <i className="bi bi-exclamation-circle-fill me-1" aria-hidden="true" />}
-                            Prioridad {item.prioridad}
-                          </span>
-                        )}
+
                       </div>
 
                       {/* Body */}
